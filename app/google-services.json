@@ -12,7 +12,20 @@
           "package_name": "com.example.solveo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "859919171178-5lhp0u0vo3gkf1375fhe3iq6i01qi6re.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.solveo",
+            "certificate_hash": "3ef031700ddc7e3b4d2b667d0f846c881dc183eb"
+          }
+        },
+        {
+          "client_id": "859919171178-d1radfonh2u2lc43tdfbgti6ssnfu262.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBrqzr0BqxfPnZeFpQeWuPPa77JVy1yYto"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859919171178-d1radfonh2u2lc43tdfbgti6ssnfu262.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
