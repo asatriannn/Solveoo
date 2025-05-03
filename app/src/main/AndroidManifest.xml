@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Solveo"
         tools:targetApi="31">
         <activity
+            android:name=".StartTestActivity"
+            android:exported="false" />
+        <activity
             android:name=".QuestionActivity"
             android:exported="false" />
         <activity

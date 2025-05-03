@@ -1,6 +1,7 @@
 package com.example.solveo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,17 @@ public class TestAdapter extends BaseAdapter {
 
         TextView title = view.findViewById(R.id.test_title);
         TextView score = view.findViewById(R.id.test_score);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DbQuery.g_selected_test_index = position;
+
+                Intent intent = new Intent(view.getContext(), StartTestActivity.class);
+
+                view.getContext().startActivity(intent);
+            }
+        });
 
         TestModel model = testList.get(position);
         title.setText(model.getTitle());

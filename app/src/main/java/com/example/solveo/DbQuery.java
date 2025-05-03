@@ -17,6 +17,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,10 @@ public class DbQuery {
     public static int g_selected_cat_index = 0;
 
     public static List<TestModel> g_testList = new ArrayList<>();
+
+    public static int g_selected_test_index = 0;
+
+    public static List<QuestionModel> g_questionList = new ArrayList<>();
 
 
 
@@ -77,12 +82,22 @@ public class DbQuery {
                             return;
                         }
 
-                        final int[] loadedCount = {0}; // ✅ Track how many have loaded
+                        // Create fixed-size list with nulls
+                        List<CategoryModel> tempList = new ArrayList<>(Collections.nCopies((int) catCount, null));
+
+                        final int[] loadedCount = {0};
 
                         for (int i = 1; i <= catCount; i++) {
+                            final int index = i; // preserve loop index for inner class
                             String catID = documentSnapshot.getString("Cat" + i + "_ID");
 
                             if (catID == null || catID.isEmpty()) {
+                                loadedCount[0]++;
+                                if (loadedCount[0] == catCount) {
+                                    g_catList.clear();
+                                    g_catList.addAll(tempList);
+                                    completeListener.onSuccess();
+                                }
                                 continue;
                             }
 
@@ -93,19 +108,22 @@ public class DbQuery {
                                             Long numTestsLong = catDoc.getLong("Number_of_Tests");
                                             int numOfTests = (numTestsLong != null) ? numTestsLong.intValue() : 0;
 
-
-                                            g_catList.add(new CategoryModel(catID, catName, numOfTests));
+                                            tempList.set(index - 1, new CategoryModel(catID, catName, numOfTests));
                                         }
 
                                         loadedCount[0]++;
                                         if (loadedCount[0] == catCount) {
-                                            completeListener.onSuccess(); // ✅ Call success only after all are loaded
+                                            g_catList.clear();
+                                            g_catList.addAll(tempList);
+                                            completeListener.onSuccess();
                                         }
                                     })
                                     .addOnFailureListener(e -> {
                                         loadedCount[0]++;
                                         if (loadedCount[0] == catCount) {
-                                            completeListener.onSuccess(); // Still call success even if some failed
+                                            g_catList.clear();
+                                            g_catList.addAll(tempList);
+                                            completeListener.onSuccess();
                                         }
                                     });
                         }
@@ -115,6 +133,7 @@ public class DbQuery {
                 })
                 .addOnFailureListener(e -> completeListener.onFailure());
     }
+
 
     public static void loadTestData(MyCompleteListener completeListener){
         g_testList.clear();
@@ -157,6 +176,39 @@ public class DbQuery {
     }
 
 
+    public static void loadquestions(MyCompleteListener completeListener){
+
+        g_questionList.clear();
+        g_firestore.collection("Questions")
+                .whereEqualTo("CATEGORY", g_catList.get(g_selected_cat_index).getDocID())
+                .whereEqualTo("TEST", g_testList.get(g_selected_test_index).getTestID())
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        for(DocumentSnapshot doc : queryDocumentSnapshots){
+
+                            g_questionList.add(new QuestionModel(
+                                    doc.getString("QUESTION"),
+                                    doc.getString("A"),
+                                    doc.getString("B"),
+                                    doc.getString("C"),
+                                    doc.getString("D"),
+                                    doc.getLong("ANSWER").intValue()
+                            ));
+                        }
+
+                        completeListener.onSuccess();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        completeListener.onFailure();
+                    }
+                });
+    }
 
 
 

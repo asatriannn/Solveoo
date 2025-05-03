@@ -74,6 +74,7 @@
                 android:textColor="@color/white"
                 android:text="Forgot Password?" />
 
+
             <Button
                 android:id="@+id/loginbtn"
                 android:layout_width="match_parent"
@@ -85,9 +86,6 @@
                 android:textColor="#1075BB"
                 android:textSize="25dp"
                 app:cornerRadius="12dp" />
-
-
-
 
             <LinearLayout
                 android:id="@+id/signup"

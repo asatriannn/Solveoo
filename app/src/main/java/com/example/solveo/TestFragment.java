@@ -1,10 +1,12 @@
 package com.example.solveo;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,8 +16,10 @@ import androidx.fragment.app.Fragment;
 public class TestFragment extends Fragment {
 
     private LinearLayout catContainer;
-    private TextView loadingText;
     private boolean categoriesDisplayed = false;
+
+    private Dialog dialogProgress;
+    private TextView dialogText;
 
     public TestFragment() {}
 
@@ -25,19 +29,23 @@ public class TestFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_test, container, false);
 
         catContainer = view.findViewById(R.id.testCaregoryView);
-        loadingText = view.findViewById(R.id.loadingText);
+
+        // Initialize dialog
+        dialogProgress = new Dialog(requireContext());
+        dialogProgress.setContentView(R.layout.dialog_layout);
+        dialogProgress.setCancelable(false);
+        dialogProgress.getWindow().setLayout(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        dialogText = dialogProgress.findViewById(R.id.dialog_text);
+        dialogText.setText("Loading...");
 
         if (DbQuery.g_catList.isEmpty()) {
-            // Show loading
-            loadingText.setVisibility(View.VISIBLE);
-            catContainer.setVisibility(View.GONE);
+            dialogProgress.show();
 
             DbQuery.loadCategories(new MyCompleteListener() {
                 @Override
                 public void onSuccess() {
                     if (isAdded()) {
-                        loadingText.setVisibility(View.GONE);
-                        catContainer.setVisibility(View.VISIBLE);
+                        dialogProgress.dismiss();
                         displayCategories();
                     }
                 }
@@ -45,7 +53,8 @@ public class TestFragment extends Fragment {
                 @Override
                 public void onFailure() {
                     if (isAdded()) {
-                        loadingText.setText("Failed to load categories.");
+                        dialogProgress.dismiss();
+                        Toast.makeText(getContext(), "Failed to load categories", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -73,7 +82,6 @@ public class TestFragment extends Fragment {
                 int index = DbQuery.g_catList.indexOf(model);
                 DbQuery.g_selected_cat_index = index;
                 Intent intent = new Intent(getContext(), TestActivity.class);
-                //intent.putExtra("CAT_INDEX", index);
                 startActivity(intent);
             });
         }
