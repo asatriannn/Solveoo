@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         googleLogIn = findViewById(R.id.google_login);
 
         mAuth = FirebaseAuth.getInstance();
-        DbQuery.g_firestore = FirebaseFirestore.getInstance(); // ✅ Initialize Firestore
+        DbQuery.g_firestore = FirebaseFirestore.getInstance();
 
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -78,21 +78,18 @@ public class LoginActivity extends AppCompatActivity {
         dialogText = dialogProgress.findViewById(R.id.dialog_text);
         dialogText.setText("Logging in");
 
-        // Sign up button
         signup.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
             startActivity(intent);
             finish();
         });
 
-        // Login with email/password
         loginbtn.setOnClickListener(v -> {
             if (validateData()) {
                 login();
             }
         });
 
-        // Google login button
         googleLogIn.setOnClickListener(v -> googlelog());
     }
 
@@ -114,9 +111,19 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     dialogProgress.dismiss();
                     if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
+                        DbQuery.loadCategories(new MyCompleteListener() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Toast.makeText(LoginActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     } else {
                         Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     }
@@ -154,23 +161,44 @@ public class LoginActivity extends AppCompatActivity {
                         String email = user.getEmail();
                         String name = user.getDisplayName();
 
-                        // Check if user already exists in Firestore
                         DbQuery.g_firestore.collection("USERS").document(uid)
                                 .get()
                                 .addOnSuccessListener(documentSnapshot -> {
                                     if (documentSnapshot.exists()) {
-                                        // User exists → Go to MainActivity
-                                        dialogProgress.dismiss();
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                        finish();
-                                    } else {
-                                        // User doesn't exist → Create user
-                                        DbQuery.createUserData(email, name, new MyCompleteListener() {
+                                        // ✅ User exists
+                                        DbQuery.loadCategories(new MyCompleteListener() {
                                             @Override
                                             public void onSuccess() {
                                                 dialogProgress.dismiss();
                                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                                 finish();
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                dialogProgress.dismiss();
+                                                Toast.makeText(LoginActivity.this, "Failed to load categories", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } else {
+                                        // ✅ User doesn't exist → Create new
+                                        DbQuery.createUserData(email, name, new MyCompleteListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                DbQuery.loadCategories(new MyCompleteListener() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        dialogProgress.dismiss();
+                                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                        finish();
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure() {
+                                                        dialogProgress.dismiss();
+                                                        Toast.makeText(LoginActivity.this, "Failed to load categories", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
                                             }
 
                                             @Override

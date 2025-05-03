@@ -1,120 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/testScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="#FFFFFF">
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="16dp">
 
+    <!-- Header Card -->
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_marginTop="16dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/rdcorner_blue"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="8dp"
+        android:layout_marginBottom="16dp">
 
-        <!-- Header Card -->
+        <TextView
+            android:id="@+id/tvGreeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="@font/fredoka_one"
+            android:text="Practice Tests"
+            android:textColor="@android:color/white"
+            android:textSize="36dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/fredoka_light"
+            android:text="Boost Your Confidence with Real Practice Tests!"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <!-- Search Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/rdcorner_blue"
-            android:orientation="vertical"
+            android:background="@drawable/search_bg"
+            android:orientation="horizontal"
             android:padding="8dp">
 
-            <TextView
-                android:id="@+id/tvGreeting"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="4dp"
-                android:fontFamily="@font/fredoka_one"
-                android:text="Practice Tests"
-                android:textColor="@android:color/white"
-                android:textSize="36dp"
-                android:textStyle="bold" />
+                android:layout_weight="9"
+                android:background="@android:color/transparent"
+                android:hint="Search for anything!!"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:padding="8dp"
+                android:textColor="@android:color/black" />
 
-            <TextView
-                android:id="@+id/tvSubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginBottom="16dp"
-                android:fontFamily="@font/fredoka_light"
-                android:text="Boost Your Confidence with Real Practice Tests!"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-
-            <!-- Search Bar -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/search_bg"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <EditText
-                    android:id="@+id/etSearch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="9"
-                    android:background="@android:color/transparent"
-                    android:hint="Search for anything!!"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:padding="8dp"
-                    android:textColor="@android:color/black" />
-
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:src="@drawable/search_ic" />
-            </LinearLayout>
-
-            </LinearLayout>
-
-
-        <!-- Leaderboard -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="16dp"
-            android:layout_marginBottom="16dp"
-            android:foreground="?android:attr/selectableItemBackground">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/leaderboard" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:fontFamily="@font/fredoka_one"
-                    android:text="Leaderboard"
-                    android:textColor="#FFFFFF"
-                    android:textSize="35sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Practice Tests List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/testRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
+                android:layout_weight="1"
+                android:src="@drawable/search_ic" />
+        </LinearLayout>
     </LinearLayout>
 
-</androidx.core.widget.NestedScrollView>
+    <!-- Leaderboard -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="16dp"
+        android:layout_marginBottom="16dp"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/leaderboard" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:fontFamily="@font/fredoka_one"
+                android:text="Leaderboard"
+                android:textColor="#FFFFFF"
+                android:textSize="35sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- 🔽 Loading text -->
+    <TextView
+        android:id="@+id/loadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading categories..."
+        android:textColor="#444"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone" />
+
+    <!-- Category Cards Container -->
+    <LinearLayout
+        android:id="@+id/testCaregoryView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="12dp" />
+
+</LinearLayout>

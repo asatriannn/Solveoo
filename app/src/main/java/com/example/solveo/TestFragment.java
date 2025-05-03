@@ -1,64 +1,81 @@
 package com.example.solveo;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TestFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import androidx.fragment.app.Fragment;
+
 public class TestFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private LinearLayout catContainer;
+    private TextView loadingText;
+    private boolean categoriesDisplayed = false;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public TestFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TestFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TestFragment newInstance(String param1, String param2) {
-        TestFragment fragment = new TestFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public TestFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_test, container, false);
+        View view = inflater.inflate(R.layout.fragment_test, container, false);
+
+        catContainer = view.findViewById(R.id.testCaregoryView);
+        loadingText = view.findViewById(R.id.loadingText);
+
+        if (DbQuery.g_catList.isEmpty()) {
+            // Show loading
+            loadingText.setVisibility(View.VISIBLE);
+            catContainer.setVisibility(View.GONE);
+
+            DbQuery.loadCategories(new MyCompleteListener() {
+                @Override
+                public void onSuccess() {
+                    if (isAdded()) {
+                        loadingText.setVisibility(View.GONE);
+                        catContainer.setVisibility(View.VISIBLE);
+                        displayCategories();
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+                    if (isAdded()) {
+                        loadingText.setText("Failed to load categories.");
+                    }
+                }
+            });
+        } else {
+            displayCategories();
+        }
+
+        return view;
+    }
+
+    private void displayCategories() {
+        if (categoriesDisplayed) return;
+        categoriesDisplayed = true;
+
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        catContainer.removeAllViews();
+
+        for (CategoryModel model : DbQuery.g_catList) {
+            View itemView = inflater.inflate(R.layout.cat_item_layout, catContainer, false);
+            TextView catName = itemView.findViewById(R.id.CatNameText);
+            catName.setText(model.getName());
+            catContainer.addView(itemView);
+
+            itemView.setOnClickListener(v -> {
+                int index = DbQuery.g_catList.indexOf(model);
+                DbQuery.g_selected_cat_index = index;
+                Intent intent = new Intent(getContext(), TestActivity.class);
+                //intent.putExtra("CAT_INDEX", index);
+                startActivity(intent);
+            });
+        }
     }
 }
