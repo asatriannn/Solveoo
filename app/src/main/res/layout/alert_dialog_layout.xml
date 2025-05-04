@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    android:background="@drawable/question_bg"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/finsihtext"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Finish the test"
+        android:textSize="20dp"
+        android:textColor="#0E75BB"
+        android:fontFamily="@font/fredoka_one"/>
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@+id/finsihtext"
+        android:background="?android:attr/listDivider"
+        tools:layout_editor_absoluteX="-8dp"
+        tools:layout_editor_absoluteY="24dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:id="@+id/text222"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider2"
+        android:text="Are you sure you wanna finish the test?"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/fredoka_light"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/text222"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+    <Button
+            android:layout_width="match_parent"
+            android:text="No"
+            android:id="@+id/no_finish"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="15dp"
+            android:backgroundTint="#0E75BB"
+            android:fontFamily="@font/fredoka_one"
+            app:cornerRadius="12dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:layout_width="match_parent"
+            android:text="Yes"
+            android:layout_marginHorizontal="15dp"
+            android:layout_weight="1"
+            android:id="@+id/yes_finish"
+            android:backgroundTint="#0E75BB"
+            app:cornerRadius="12dp"
+            android:fontFamily="@font/fredoka_one"
+            android:layout_height="wrap_content"/>
+
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
