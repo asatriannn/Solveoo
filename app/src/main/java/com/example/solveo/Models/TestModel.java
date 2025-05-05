@@ -1,4 +1,4 @@
-package com.example.solveo;
+package com.example.solveo.Models;
 
 public class TestModel {
 

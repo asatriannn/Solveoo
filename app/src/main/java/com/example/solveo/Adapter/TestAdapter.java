@@ -1,4 +1,4 @@
-package com.example.solveo;
+package com.example.solveo.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.example.solveo.DbQuery;
+import com.example.solveo.Models.TestModel;
+import com.example.solveo.R;
+import com.example.solveo.StartTestActivity;
 
 import java.util.List;
 

@@ -10,8 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.solveo.Adapter.TestAdapter;
 
 public class TestActivity extends AppCompatActivity {
 
@@ -62,10 +61,24 @@ public class TestActivity extends AppCompatActivity {
         DbQuery.loadTestData(new MyCompleteListener() {
             @Override
             public void onSuccess() {
-                TestAdapter adapter = new TestAdapter(TestActivity.this, DbQuery.g_testList);
-                testView.setAdapter(adapter);
 
-                dialogProgress.dismiss();
+                DbQuery.loadMyScores(new MyCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        TestAdapter adapter = new TestAdapter(TestActivity.this, DbQuery.g_testList);
+                        testView.setAdapter(adapter);
+
+                        dialogProgress.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        dialogProgress.dismiss();
+                        Toast.makeText(TestActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
             }
 
             @Override

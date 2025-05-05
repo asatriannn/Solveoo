@@ -5,6 +5,11 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.solveo.Models.CategoryModel;
+import com.example.solveo.Models.ProfileModel;
+import com.example.solveo.Models.QuestionModel;
+import com.example.solveo.Models.RankModel;
+import com.example.solveo.Models.TestModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -12,8 +17,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
@@ -24,55 +29,72 @@ import java.util.Map;
 public class DbQuery {
 
     public static FirebaseFirestore g_firestore;
-
     public static List<CategoryModel> g_catList = new ArrayList<>();
-
     public static int g_selected_cat_index = 0;
-
     public static List<TestModel> g_testList = new ArrayList<>();
-
     public static int g_selected_test_index = 0;
-
     public static List<QuestionModel> g_questionList = new ArrayList<>();
+    public static ProfileModel myProfile = new ProfileModel("NA", null, 0);
+    public static RankModel myPerformance = new RankModel(0, -1);
 
     public static final int NOT_VISITED = 0;
     public static final int NOT_ANSWERED = 1;
     public static final int ANSWERED = 2;
     public static final int REVIEW = 3;
 
-
-
-    public static void createUserData(String email, String name, MyCompleteListener completeListener){
+    public static void createUserData(String email, String name, MyCompleteListener completeListener) {
         Map<String, Object> userData = new ArrayMap<>();
-
         userData.put("Email_ID", email);
         userData.put("Name", name);
         userData.put("Mean_Score", 0);
 
-        DocumentReference userDoc = g_firestore.collection("USERS").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DocumentReference userDoc = g_firestore.collection("USERS")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         WriteBatch batch = g_firestore.batch();
-
         batch.set(userDoc, userData);
 
         DocumentReference countDoc = g_firestore.collection("USERS").document("TotalUsers");
-
         batch.update(countDoc, "Count", FieldValue.increment(1));
 
-        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+        batch.commit()
+                .addOnSuccessListener(unused -> completeListener.onSuccess())
+                .addOnFailureListener(e -> completeListener.onFailure());
+    }
+
+    public static void getUserData(final MyCompleteListener completeListener) {
+        g_firestore.collection("USERS")
+                .document(FirebaseAuth.getInstance().getUid())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        myProfile.setName(documentSnapshot.getString("Name"));
+                        myProfile.setEmail_ID(documentSnapshot.getString("Email_ID"));
+                        Long score = documentSnapshot.getLong("Mean_Score");
+                        myProfile.setMean_Score(score != null ? score : 0);
+
+                        myPerformance.setScore(documentSnapshot.getLong("Mean_Score").intValue());
+                        completeListener.onSuccess();
+                    } else {
+                        completeListener.onFailure();
+                    }
+                })
+                .addOnFailureListener(e -> completeListener.onFailure());
+    }
+
+    public static void loadData(final MyCompleteListener completeListener) {
+        loadCategories(new MyCompleteListener() {
             @Override
-            public void onSuccess(Void unused) {
-                completeListener.onSuccess();
+            public void onSuccess() {
+                getUserData(completeListener);
             }
-        }).addOnFailureListener(new OnFailureListener() {
+
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onFailure() {
                 completeListener.onFailure();
             }
         });
-
-     }
-
+    }
 
     public static void loadCategories(MyCompleteListener completeListener) {
         g_catList.clear();
@@ -82,18 +104,11 @@ public class DbQuery {
                     if (documentSnapshot.exists()) {
                         long catCount = documentSnapshot.getLong("Count");
 
-                        if (catCount == 0) {
-                            completeListener.onSuccess();
-                            return;
-                        }
-
-                        // Create fixed-size list with nulls
                         List<CategoryModel> tempList = new ArrayList<>(Collections.nCopies((int) catCount, null));
-
                         final int[] loadedCount = {0};
 
                         for (int i = 1; i <= catCount; i++) {
-                            final int index = i; // preserve loop index for inner class
+                            final int index = i;
                             String catID = documentSnapshot.getString("Cat" + i + "_ID");
 
                             if (catID == null || catID.isEmpty()) {
@@ -112,10 +127,8 @@ public class DbQuery {
                                             String catName = catDoc.getString("Name");
                                             Long numTestsLong = catDoc.getLong("Number_of_Tests");
                                             int numOfTests = (numTestsLong != null) ? numTestsLong.intValue() : 0;
-
                                             tempList.set(index - 1, new CategoryModel(catID, catName, numOfTests));
                                         }
-
                                         loadedCount[0]++;
                                         if (loadedCount[0] == catCount) {
                                             g_catList.clear();
@@ -139,73 +152,74 @@ public class DbQuery {
                 .addOnFailureListener(e -> completeListener.onFailure());
     }
 
-
-    public static void loadTestData(MyCompleteListener completeListener){
+    public static void loadTestData(MyCompleteListener completeListener) {
         g_testList.clear();
 
-        // 🔥 FIXED: "TESTS_LIST" (was wrongly "TEST_LIST")
         g_firestore.collection("QUIZ")
                 .document(g_catList.get(g_selected_cat_index).getDocID())
-                .collection("TESTS_LIST") // ✅ This was incorrect in your code
+                .collection("TESTS_LIST")
                 .document("TESTS_INFO")
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        int numOfTest = g_catList.get(g_selected_cat_index).getNumberOfTests();
+                .addOnSuccessListener(documentSnapshot -> {
+                    int numOfTest = g_catList.get(g_selected_cat_index).getNumberOfTests();
 
-                        for (int i = 1; i <= numOfTest; i++) {
-                            String testId = documentSnapshot.getString("Test" + i + "_ID");
-                            String title = documentSnapshot.getString("Test" + i + "_title");
-                            Long timeLong = documentSnapshot.getLong("Test" + i + "_Time");
+                    for (int i = 1; i <= numOfTest; i++) {
+                        String testId = documentSnapshot.getString("Test" + i + "_ID");
+                        String title = documentSnapshot.getString("Test" + i + "_title");
+                        Long timeLong = documentSnapshot.getLong("Test" + i + "_Time");
 
-                            Log.d("TEST_LOAD", "Test" + i + ": ID=" + testId + ", Title=" + title + ", Time=" + timeLong);
-
-                            if (testId != null && title != null && timeLong != null) {
-                                g_testList.add(new TestModel(testId, title, 0, timeLong.intValue()));
-                            } else {
-                                Log.w("TEST_LOAD", "❌ Missing data for Test" + i);
-                            }
+                        if (testId != null && title != null && timeLong != null) {
+                            g_testList.add(new TestModel(testId, title, 0, timeLong.intValue()));
                         }
+                    }
 
-                        completeListener.onSuccess();
-                    }
+                    completeListener.onSuccess();
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("TEST_LOAD", "Failed to load test data: " + e.getMessage());
-                        completeListener.onFailure();
-                    }
-                });
+                .addOnFailureListener(e -> completeListener.onFailure());
     }
 
-
-    public static void loadquestions(MyCompleteListener completeListener){
-
+    public static void loadquestions(MyCompleteListener completeListener) {
         g_questionList.clear();
         g_firestore.collection("Questions")
                 .whereEqualTo("CATEGORY", g_catList.get(g_selected_cat_index).getDocID())
                 .whereEqualTo("TEST", g_testList.get(g_selected_test_index).getTestID())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        g_questionList.add(new QuestionModel(
+                                doc.getString("QUESTION"),
+                                doc.getString("A"),
+                                doc.getString("B"),
+                                doc.getString("C"),
+                                doc.getString("D"),
+                                doc.getLong("ANSWER").intValue(),
+                                -1,
+                                NOT_VISITED
+                        ));
+                    }
+                    completeListener.onSuccess();
+                })
+                .addOnFailureListener(e -> completeListener.onFailure());
+    }
+
+    public static void loadMyScores(MyCompleteListener completeListener){
+        g_firestore.collection("USERS").document(FirebaseAuth.getInstance().getUid())
+                .collection("USER_DATA").document("MY_SCORES")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        for(DocumentSnapshot doc : queryDocumentSnapshots){
+                        for(int i = 0; i< g_testList.size(); i++){
+                            int top = 0;
+                            if (((Long) documentSnapshot.get(g_testList.get(i).getTestID())) != 0) {
 
-                            g_questionList.add(new QuestionModel(
-                                    doc.getString("QUESTION"),
-                                    doc.getString("A"),
-                                    doc.getString("B"),
-                                    doc.getString("C"),
-                                    doc.getString("D"),
-                                    doc.getLong("ANSWER").intValue(),
-                                    -1,
-                                    NOT_VISITED
-                            ));
+                                top = documentSnapshot.getLong(g_testList.get(i).getTestID()).intValue();
+
+                                g_testList.get(i).setTopScore(top);
+                            }
+
                         }
-
                         completeListener.onSuccess();
                     }
                 })
@@ -217,6 +231,44 @@ public class DbQuery {
                 });
     }
 
+    public static void saveResults(int finalScore, MyCompleteListener completeListener) {
+        String uid = FirebaseAuth.getInstance().getUid();
+        DocumentReference userDoc = g_firestore.collection("USERS").document(uid);
+
+        userDoc.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                long currentMean = documentSnapshot.getLong("Mean_Score") != null ?
+                        documentSnapshot.getLong("Mean_Score") : 0;
+
+                int completedTests = g_testList.size();
+                long newMean = (currentMean * completedTests + finalScore) / (completedTests + 1);
+
+                WriteBatch batch = g_firestore.batch();
+                batch.update(userDoc, "Mean_Score", newMean);
+
+                if (finalScore > g_testList.get(g_selected_test_index).getTopScore()) {
+                    DocumentReference scoreDoc = userDoc.collection("USER_DATA")
+                            .document("MY_SCORES");
+
+                    Map<String, Object> testData = new ArrayMap<>();
+
+                    testData.put(g_testList.get(g_selected_test_index).getTestID(),finalScore);
+                    batch.set(scoreDoc, testData, SetOptions.merge());
+                }
+
+                batch.commit()
+                        .addOnSuccessListener(unused -> {
+                            if (finalScore > g_testList.get(g_selected_test_index).getTopScore()) {
+                                g_testList.get(g_selected_test_index).setTopScore(finalScore);
 
 
+                            }
+
+                            myPerformance.setScore(finalScore);
+                            completeListener.onSuccess();
+                        })
+                        .addOnFailureListener(e -> completeListener.onFailure());
+            }
+        }).addOnFailureListener(e -> completeListener.onFailure());
+    }
 }

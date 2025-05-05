@@ -1,10 +1,13 @@
-package com.example.solveo;
+package com.example.solveo.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.example.solveo.Models.CategoryModel;
+import com.example.solveo.R;
 
 import java.util.List;
 

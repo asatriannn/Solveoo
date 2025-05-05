@@ -1,4 +1,4 @@
-package com.example.solveo;
+package com.example.solveo.Adapter;
 
 import static com.example.solveo.DbQuery.ANSWERED;
 import static com.example.solveo.DbQuery.NOT_ANSWERED;
@@ -11,6 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.example.solveo.DbQuery;
+import com.example.solveo.QuestionActivity;
+import com.example.solveo.R;
 
 public class QuestionGridAdapter extends BaseAdapter {
 

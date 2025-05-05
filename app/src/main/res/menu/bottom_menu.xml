@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/home"
+        android:id="@+id/navigation_home"
         android:icon="@drawable/home_ic"
          />
 
     <item
-        android:id="@+id/read"
+        android:id="@+id/navigation_read"
         android:icon="@drawable/read_ic"
          />
     <item
-        android:id="@+id/watch"
+        android:id="@+id/navigation_watch"
         android:icon="@drawable/watch_ic"
          />
     <item
-        android:id="@+id/test"
+        android:id="@+id/navigation_test"
         android:icon="@drawable/test_ic" />
 
     <item
-        android:id="@+id/profile"
+        android:id="@+id/navigation_profile"
         android:icon="@drawable/profile_ic"
          />
 

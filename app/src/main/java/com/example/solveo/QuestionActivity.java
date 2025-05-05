@@ -5,6 +5,8 @@ import static com.example.solveo.DbQuery.NOT_ANSWERED;
 import static com.example.solveo.DbQuery.NOT_VISITED;
 import static com.example.solveo.DbQuery.REVIEW;
 import static com.example.solveo.DbQuery.g_questionList;
+import static com.example.solveo.DbQuery.g_selected_test_index;
+import static com.example.solveo.DbQuery.g_testList;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +27,9 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
+import com.example.solveo.Adapter.QuestionGridAdapter;
+import com.example.solveo.Adapter.QuestionsAdapter;
+
 import java.util.concurrent.TimeUnit;
 
 public class QuestionActivity extends AppCompatActivity {
@@ -37,6 +42,7 @@ public class QuestionActivity extends AppCompatActivity {
     private GridView questionListGV;
     private Button finishBtn;
     public CountDownTimer timer;
+    private long timeleft;
 
     private QuestionGridAdapter gridAdapter;
 
@@ -184,7 +190,10 @@ public class QuestionActivity extends AppCompatActivity {
         yes_finish.setOnClickListener(v -> {
             timer.cancel();
             alertDialog.dismiss();
+
             Intent intent = new Intent(QuestionActivity.this, ScoreActivity.class);
+            long total_Time = g_testList.get(g_selected_test_index).getTime()*60*1000;
+            intent.putExtra("TIME TAKEN", total_Time-timeleft);
             startActivity(intent);
             QuestionActivity.this.finish();
         });
@@ -205,6 +214,8 @@ public class QuestionActivity extends AppCompatActivity {
         timer = new CountDownTimer(totalTime + 1000, 1000) {
             @Override
             public void onTick(long remainingTime) {
+
+                timeleft = remainingTime;
                 String time = String.format("%02d:%02d min",
                         TimeUnit.MILLISECONDS.toMinutes(remainingTime),
                         TimeUnit.MILLISECONDS.toSeconds(remainingTime) % 60);
@@ -214,6 +225,8 @@ public class QuestionActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 Intent intent = new Intent(QuestionActivity.this, ScoreActivity.class);
+                long total_Time = g_testList.get(g_selected_test_index).getTime()*60*1000;
+                intent.putExtra("TIME TAKEN", total_Time-timeleft);
                 startActivity(intent);
                 QuestionActivity.this.finish();
             }
