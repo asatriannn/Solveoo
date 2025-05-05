@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.solveo.Models.CategoryModel;
+import com.example.solveo.Models.CompletedTestModule;
 import com.example.solveo.Models.ProfileModel;
 import com.example.solveo.Models.QuestionModel;
 import com.example.solveo.Models.RankModel;
@@ -36,6 +37,7 @@ public class DbQuery {
     public static List<QuestionModel> g_questionList = new ArrayList<>();
     public static ProfileModel myProfile = new ProfileModel("NA", null, 0);
     public static RankModel myPerformance = new RankModel(0, -1);
+    public static List<CompletedTestModule> g_completedTests = new ArrayList<>();
 
     public static final int NOT_VISITED = 0;
     public static final int NOT_ANSWERED = 1;
@@ -81,6 +83,34 @@ public class DbQuery {
                 })
                 .addOnFailureListener(e -> completeListener.onFailure());
     }
+
+    public static void completedTests(MyCompleteListener completeListener) {
+        g_completedTests.clear(); // reset before loading new data
+
+        g_firestore.collection("USERS")
+                .document(FirebaseAuth.getInstance().getUid())
+                .collection("USER_DATA")
+                .document("MY_SCORES")
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Map<String, Object> data = documentSnapshot.getData();
+                        if (data != null) {
+                            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                                String testId = entry.getKey();
+                                Long scoreLong = (Long) entry.getValue();
+                                int score = scoreLong != null ? scoreLong.intValue() : 0;
+                                g_completedTests.add(new CompletedTestModule(testId, score));
+                            }
+                        }
+                        completeListener.onSuccess();
+                    } else {
+                        completeListener.onFailure();
+                    }
+                })
+                .addOnFailureListener(e -> completeListener.onFailure());
+    }
+
 
     public static void loadData(final MyCompleteListener completeListener) {
         loadCategories(new MyCompleteListener() {
@@ -202,73 +232,68 @@ public class DbQuery {
                 .addOnFailureListener(e -> completeListener.onFailure());
     }
 
-    public static void loadMyScores(MyCompleteListener completeListener){
+    public static void loadMyScores(MyCompleteListener completeListener) {
         g_firestore.collection("USERS").document(FirebaseAuth.getInstance().getUid())
                 .collection("USER_DATA").document("MY_SCORES")
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                        for(int i = 0; i< g_testList.size(); i++){
-                            int top = 0;
-                            if (((Long) documentSnapshot.get(g_testList.get(i).getTestID())) != 0) {
-
-                                top = documentSnapshot.getLong(g_testList.get(i).getTestID()).intValue();
-
-                                g_testList.get(i).setTopScore(top);
-                            }
-
-                        }
-                        completeListener.onSuccess();
+                .addOnSuccessListener(documentSnapshot -> {
+                    for (int i = 0; i < g_testList.size(); i++) {
+                        Long scoreLong = documentSnapshot.getLong(g_testList.get(i).getTestID());
+                        int top = (scoreLong != null) ? scoreLong.intValue() : 0;
+                        g_testList.get(i).setTopScore(top);
                     }
+                    completeListener.onSuccess();
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        completeListener.onFailure();
-                    }
-                });
+                .addOnFailureListener(e -> completeListener.onFailure());
     }
+
 
     public static void saveResults(int finalScore, MyCompleteListener completeListener) {
         String uid = FirebaseAuth.getInstance().getUid();
         DocumentReference userDoc = g_firestore.collection("USERS").document(uid);
+        DocumentReference scoreDoc = userDoc.collection("USER_DATA").document("MY_SCORES");
 
-        userDoc.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                long currentMean = documentSnapshot.getLong("Mean_Score") != null ?
-                        documentSnapshot.getLong("Mean_Score") : 0;
+        scoreDoc.get().addOnSuccessListener(documentSnapshot -> {
+            Map<String, Object> scores = new ArrayMap<>();
 
-                int completedTests = g_testList.size();
-                long newMean = (currentMean * completedTests + finalScore) / (completedTests + 1);
-
-                WriteBatch batch = g_firestore.batch();
-                batch.update(userDoc, "Mean_Score", newMean);
-
-                if (finalScore > g_testList.get(g_selected_test_index).getTopScore()) {
-                    DocumentReference scoreDoc = userDoc.collection("USER_DATA")
-                            .document("MY_SCORES");
-
-                    Map<String, Object> testData = new ArrayMap<>();
-
-                    testData.put(g_testList.get(g_selected_test_index).getTestID(),finalScore);
-                    batch.set(scoreDoc, testData, SetOptions.merge());
-                }
-
-                batch.commit()
-                        .addOnSuccessListener(unused -> {
-                            if (finalScore > g_testList.get(g_selected_test_index).getTopScore()) {
-                                g_testList.get(g_selected_test_index).setTopScore(finalScore);
-
-
-                            }
-
-                            myPerformance.setScore(finalScore);
-                            completeListener.onSuccess();
-                        })
-                        .addOnFailureListener(e -> completeListener.onFailure());
+            if (documentSnapshot.exists() && documentSnapshot.getData() != null) {
+                scores.putAll(documentSnapshot.getData());
             }
+
+            String testId = g_testList.get(g_selected_test_index).getTestID();
+            if (testId == null || testId.isEmpty()) {
+                completeListener.onFailure();
+                return;
+            }
+
+            Long prevScoreLong = (Long) scores.get(testId);
+            int prevScore = prevScoreLong != null ? prevScoreLong.intValue() : -1;
+
+            if (finalScore > prevScore) {
+                scores.put(testId, finalScore);
+            }
+
+            int sum = 0;
+            int count = 0;
+            for (Object value : scores.values()) {
+                if (value instanceof Number) {
+                    sum += ((Number) value).intValue();
+                    count++;
+                }
+            }
+            int newMean = count > 0 ? sum / count : 0;
+
+            WriteBatch batch = g_firestore.batch();
+            batch.update(userDoc, "Mean_Score", newMean);
+            batch.set(scoreDoc, scores, SetOptions.merge());
+
+            batch.commit().addOnSuccessListener(unused -> {
+                g_testList.get(g_selected_test_index).setTopScore(finalScore);
+                myPerformance.setScore(finalScore);
+                myProfile.setMean_Score(newMean);
+                completeListener.onSuccess();
+            }).addOnFailureListener(e -> completeListener.onFailure());
         }).addOnFailureListener(e -> completeListener.onFailure());
     }
+
 }
