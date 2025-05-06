@@ -2,16 +2,18 @@ package com.example.solveo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -23,6 +25,7 @@ public class ProfileFragment extends Fragment {
 
     private LinearLayout logout_btn, settings, bookmarkBtn;
     private TextView profileName, ranking, meanScore;
+    private ImageView profilePic;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -38,6 +41,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
+
                 GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestIdToken(getString(R.string.default_web_client_id))
                         .requestEmail()
@@ -60,14 +64,15 @@ public class ProfileFragment extends Fragment {
         bookmarkBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // You can add bookmark activity logic here
+                // Add your bookmark logic here
             }
         });
 
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // You can add settings logic here
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -78,12 +83,25 @@ public class ProfileFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // Always update with the latest data
-        if (DbQuery.myProfile != null) {
-            profileName.setText(DbQuery.myProfile.getName());
-            meanScore.setText(String.valueOf(DbQuery.myProfile.getMean_Score()));
-        }
+        DbQuery.getUserData(new MyCompleteListener() {
+            @Override
+            public void onSuccess() {
+                profileName.setText(DbQuery.myProfile.getName());
+                meanScore.setText(String.valueOf(DbQuery.myProfile.getMean_Score()));
+
+                String url = DbQuery.myProfile.getProfileURL();
+                if (url != null && !url.isEmpty()) {
+                    Glide.with(getContext()).load(url).into(profilePic);
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(getContext(), "Failed to load profile", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     private void init(View view) {
         logout_btn = view.findViewById(R.id.logout_btn);
@@ -93,5 +111,6 @@ public class ProfileFragment extends Fragment {
         profileName = view.findViewById(R.id.profile_name);
         ranking = view.findViewById(R.id.ranking);
         meanScore = view.findViewById(R.id.mean_score);
+        profilePic = view.findViewById(R.id.prodile_picture); // your ImageView id is misspelled as "prodile_picture"
     }
 }

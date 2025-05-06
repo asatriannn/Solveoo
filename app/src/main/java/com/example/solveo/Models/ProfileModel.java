@@ -4,9 +4,10 @@ public class ProfileModel {
     private String Name;
     private String Email_ID;
     private long Mean_Score;
+    private String profileURL; // ✅ NEW
 
     public ProfileModel() {
-        // Required for Firestore deserialization
+        // Require for Firestore deserialization
     }
 
     public ProfileModel(String name, String email_ID, long mean_Score) {
@@ -37,5 +38,13 @@ public class ProfileModel {
 
     public void setMean_Score(long mean_Score) {
         Mean_Score = mean_Score;
+    }
+
+    public String getProfileURL() {
+        return profileURL;
+    }
+
+    public void setProfileURL(String profileURL) {
+        this.profileURL = profileURL;
     }
 }

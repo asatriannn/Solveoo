@@ -81,6 +81,12 @@ public class DbQuery {
                         Long score = documentSnapshot.getLong("Mean_Score");
                         myProfile.setMean_Score(score != null ? score : 0);
 
+                        String profileUrl = documentSnapshot.getString("profile");
+                        if (profileUrl != null) {
+                            myProfile.setProfileURL(profileUrl);
+                        }
+
+
                         myPerformance.setScore(documentSnapshot.getLong("Mean_Score").intValue());
                         completeListener.onSuccess();
                     } else {
