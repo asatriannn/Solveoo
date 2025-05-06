@@ -1,6 +1,11 @@
 package com.example.solveo;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -8,12 +13,15 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.solveo.databinding.ActivityMainBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess() {
                 dialogProgress.dismiss();
                 replaceFragment(new HomeFragment());
+
+                // ✅ Schedule 8PM daily reminder
+                scheduleDailyReminder();
             }
 
             @Override
@@ -70,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navigation_profile) {
                 replaceFragment(new ProfileFragment());
             }
-
             return true;
         });
+
+        requestNotificationPermission();
     }
 
     private void replaceFragment(Fragment fragment) {
@@ -80,5 +92,56 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.main_frame, fragment);
         fragmentTransaction.commit();
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{"android.permission.POST_NOTIFICATIONS"},
+                    1
+            );
+        }
+    }
+
+    // ⏰ Schedule daily notification at 8PM
+    private void scheduleDailyReminder() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 20); // 8 PM
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        Intent intent = new Intent(this, ReminderReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE
+        );
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExactAndAllowWhileIdle(
+                            AlarmManager.RTC_WAKEUP,
+                            calendar.getTimeInMillis(),
+                            pendingIntent
+                    );
+                } else {
+                    Toast.makeText(this, "Enable exact alarm permission in settings", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.getTimeInMillis(),
+                        pendingIntent
+                );
+            }
+        }
     }
 }
