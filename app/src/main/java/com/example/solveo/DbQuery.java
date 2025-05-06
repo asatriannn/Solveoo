@@ -5,12 +5,14 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.solveo.Models.ArticleModel;
 import com.example.solveo.Models.CategoryModel;
 import com.example.solveo.Models.CompletedTestModule;
 import com.example.solveo.Models.ProfileModel;
 import com.example.solveo.Models.QuestionModel;
 import com.example.solveo.Models.RankModel;
 import com.example.solveo.Models.TestModel;
+import com.example.solveo.Models.VideoModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +40,8 @@ public class DbQuery {
     public static ProfileModel myProfile = new ProfileModel("NA", null, 0);
     public static RankModel myPerformance = new RankModel(0, -1);
     public static List<CompletedTestModule> g_completedTests = new ArrayList<>();
+    public static List<ArticleModel> g_articleList = new ArrayList<>();
+    public static List<VideoModel> g_videoList = new ArrayList<>();
 
     public static final int NOT_VISITED = 0;
     public static final int NOT_ANSWERED = 1;
@@ -104,6 +108,47 @@ public class DbQuery {
                             }
                         }
                         completeListener.onSuccess();
+                    } else {
+                        completeListener.onFailure();
+                    }
+                })
+                .addOnFailureListener(e -> completeListener.onFailure());
+    }
+
+    public static void loadVideos(MyCompleteListener completeListener) {
+        g_videoList.clear();
+
+        g_firestore.collection("VIDEOS")
+                .document("Main")
+                .get()
+                .addOnSuccessListener(doc -> {
+                    Long countLong = doc.getLong("Number_of_Videos");
+                    if (countLong != null) {
+                        int count = countLong.intValue();
+
+                        for (int i = 1; i <= count; i++) {
+                            String videoID = doc.getString("Video" + i + "_ID");
+
+                            if (videoID != null) {
+                                g_firestore.collection("VIDEOS")
+                                        .document(videoID)
+                                        .get()
+                                        .addOnSuccessListener(videoSnap -> {
+                                            String title = videoSnap.getString("Video_title");
+                                            String desc = videoSnap.getString("Video_description");
+                                            String link = videoSnap.getString("Video_link");
+
+                                            if (title != null && desc != null && link != null) {
+                                                g_videoList.add(new VideoModel(videoID, title, desc, link));
+                                            }
+
+                                            if (g_videoList.size() == count) {
+                                                completeListener.onSuccess();
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> completeListener.onFailure());
+                            }
+                        }
                     } else {
                         completeListener.onFailure();
                     }
@@ -207,6 +252,49 @@ public class DbQuery {
                 })
                 .addOnFailureListener(e -> completeListener.onFailure());
     }
+
+    public static void loadArticles(MyCompleteListener completeListener) {
+        g_articleList.clear();
+
+        g_firestore.collection("ARTICLES")
+                .document("Articles")
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Long numOfArticlesLong = documentSnapshot.getLong("Number_of_Articles");
+
+                    if (numOfArticlesLong != null) {
+                        int numOfArticles = numOfArticlesLong.intValue();
+
+                        for (int i = 1; i <= numOfArticles; i++) {
+                            String articleID = documentSnapshot.getString("Article" + i + "_ID");
+
+                            if (articleID != null) {
+                                int finalI = i; // for logging/debugging
+                                g_firestore.collection("ARTICLES")
+                                        .document(articleID)
+                                        .get()
+                                        .addOnSuccessListener(articleSnap -> {
+                                            String title = articleSnap.getString("Article_title");
+                                            String content = articleSnap.getString("Article_content");
+
+                                            if (title != null && content != null) {
+                                                g_articleList.add(new ArticleModel(content, title, articleID));
+                                            }
+
+                                            if (g_articleList.size() == numOfArticles) {
+                                                completeListener.onSuccess();
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> completeListener.onFailure());
+                            }
+                        }
+                    } else {
+                        completeListener.onFailure();
+                    }
+                })
+                .addOnFailureListener(e -> completeListener.onFailure());
+    }
+
 
     public static void loadquestions(MyCompleteListener completeListener) {
         g_questionList.clear();

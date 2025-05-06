@@ -1,14 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:card_view="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".HomeFragment">
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WatchFragment">
+    android:layout_marginStart="10dp"
+    android:layout_marginTop="25dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginBottom="10dp"
+    android:orientation="vertical"
+    android:background="@color/white">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Header Section -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Watch" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rdcorner_blue"
+        android:orientation="vertical"
+        android:padding="8dp">
 
+        <TextView
+            android:id="@+id/tvGreeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="@font/fredoka_one"
+            android:text="Watch and Learn"
+            android:textColor="@android:color/white"
+            android:textSize="36dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/fredoka_light"
+            android:text="Hit play, get smart — it’s like learning, but cooler."
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <!-- Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/search_bg"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:background="@android:color/transparent"
+                android:hint="Search for anything!!"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:padding="8dp"
+                android:textColor="@android:color/black" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/search_ic" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- RecyclerView for Articles -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/videoRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
+</LinearLayout>
 </FrameLayout>
+
