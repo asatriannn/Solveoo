@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.example.solveo.Models.ArticleModel;
 import com.example.solveo.Models.CategoryModel;
 import com.example.solveo.Models.CompletedTestModule;
+import com.example.solveo.Models.LeaderboardUserModel;
 import com.example.solveo.Models.ProfileModel;
 import com.example.solveo.Models.QuestionModel;
 import com.example.solveo.Models.RankModel;
@@ -42,6 +43,7 @@ public class DbQuery {
     public static List<CompletedTestModule> g_completedTests = new ArrayList<>();
     public static List<ArticleModel> g_articleList = new ArrayList<>();
     public static List<VideoModel> g_videoList = new ArrayList<>();
+
 
     public static final int NOT_VISITED = 0;
     public static final int NOT_ANSWERED = 1;
@@ -334,6 +336,25 @@ public class DbQuery {
                 })
                 .addOnFailureListener(e -> completeListener.onFailure());
     }
+
+    public static void loadLeaderboardUsers(MyCompleteListener completeListener, List<LeaderboardUserModel> leaderboardList) {
+        g_firestore.collection("USERS")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    leaderboardList.clear();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        if (doc.contains("Name") && doc.contains("Mean_Score")) {
+                            String name = doc.getString("Name");
+                            String profileUrl = doc.getString("profile");
+                            int score = doc.getLong("Mean_Score") != null ? doc.getLong("Mean_Score").intValue() : 0;
+                            leaderboardList.add(new LeaderboardUserModel(doc.getId(), name, profileUrl, score));
+                        }
+                    }
+                    completeListener.onSuccess();
+                })
+                .addOnFailureListener(e -> completeListener.onFailure());
+    }
+
 
 
     public static void saveResults(int finalScore, MyCompleteListener completeListener) {

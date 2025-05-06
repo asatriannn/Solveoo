@@ -80,6 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="120dp"
         app:cardElevation="4dp"
+        android:id="@+id/gotoleaderboard"
         app:cardCornerRadius="16dp"
         android:layout_marginBottom="16dp"
         android:foreground="?android:attr/selectableItemBackground">
@@ -100,18 +101,6 @@
                 android:textStyle="bold" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
-
-    <!-- 🔽 Loading text -->
-    <TextView
-        android:id="@+id/loadingText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading categories..."
-        android:textColor="#444"
-        android:textSize="16sp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="12dp"
-        android:visibility="gone" />
 
     <!-- Category Cards Container -->
     <LinearLayout

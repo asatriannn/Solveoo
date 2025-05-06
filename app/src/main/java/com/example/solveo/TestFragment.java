@@ -1,5 +1,6 @@
 package com.example.solveo;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.example.solveo.Models.CategoryModel;
@@ -22,15 +24,28 @@ public class TestFragment extends Fragment {
 
     private Dialog dialogProgress;
     private TextView dialogText;
+    private CardView leaderboard;
 
     public TestFragment() {}
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_test, container, false);
 
         catContainer = view.findViewById(R.id.testCaregoryView);
+        leaderboard = view.findViewById(R.id.gotoleaderboard);
+
+        leaderboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), LeaderboardActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
         // Initialize dialog
         dialogProgress = new Dialog(requireContext());
