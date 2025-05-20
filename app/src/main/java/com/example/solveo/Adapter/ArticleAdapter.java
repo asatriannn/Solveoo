@@ -19,7 +19,7 @@ import java.util.List;
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<ArticleModel> articleList;
+    private  List<ArticleModel> articleList;
 
     public ArticleAdapter(Context context, List<ArticleModel> articleList) {
         this.context = context;
@@ -49,6 +49,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     public int getItemCount() {
         return articleList.size();
     }
+
+    public void filterList(List<ArticleModel> filteredList) {
+        this.articleList = filteredList;
+        notifyDataSetChanged();
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title;

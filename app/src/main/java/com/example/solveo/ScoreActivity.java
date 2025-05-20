@@ -61,6 +61,14 @@ public class ScoreActivity extends AppCompatActivity {
 
         loadData();
 
+        leaderB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ScoreActivity.this, LeaderboardActivity.class);
+                startActivity(intent);
+            }
+        });
+
         viewAnswerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

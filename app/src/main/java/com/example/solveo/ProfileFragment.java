@@ -14,12 +14,16 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.solveo.Models.LeaderboardUserModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileFragment extends Fragment {
 
@@ -61,12 +65,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        bookmarkBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Add your bookmark logic here
-            }
-        });
+
 
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +92,30 @@ public class ProfileFragment extends Fragment {
                 if (url != null && !url.isEmpty()) {
                     Glide.with(getContext()).load(url).into(profilePic);
                 }
+
+                // 🔹 Now load leaderboard users
+                List<LeaderboardUserModel> leaderboardList = new ArrayList<>();
+
+                DbQuery.loadLeaderboardUsers(new MyCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        leaderboardList.sort((a, b) -> Integer.compare(b.getMeanScore(), a.getMeanScore()));
+                        String currentUserId = FirebaseAuth.getInstance().getUid();
+
+                        for (int i = 0; i < leaderboardList.size(); i++) {
+                            LeaderboardUserModel user = leaderboardList.get(i);
+                            if (user.getUserID().equals(currentUserId)) {
+                                ranking.setText(String.valueOf(i + 1));
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        ranking.setText("N/A");
+                    }
+                }, leaderboardList);
             }
 
             @Override
@@ -103,10 +126,11 @@ public class ProfileFragment extends Fragment {
     }
 
 
+
     private void init(View view) {
         logout_btn = view.findViewById(R.id.logout_btn);
         settings = view.findViewById(R.id.setting_layout);
-        bookmarkBtn = view.findViewById(R.id.bookmarkedQuestions);
+
 
         profileName = view.findViewById(R.id.profile_name);
         ranking = view.findViewById(R.id.ranking);

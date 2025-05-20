@@ -87,128 +87,16 @@
         </LinearLayout>
 
         <!-- Three Tiles (Read & Learn, Watch & Learn, Your Progress) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+        <!-- Three Tiles (Read & Learn, Watch & Learn, Your Progress) -->
 
-            <!-- Card 1: Read & Learn -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:elevation="4dp"
-                android:foreground="?attr/selectableItemBackground"
-                card_view:cardCornerRadius="8dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rdcorner_blue"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="25dp">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@drawable/read_ic" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/fredoka_one"
-                        android:text="Read and Learn"
-                        android:textAlignment="center"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Card 2: Watch & Learn -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:elevation="4dp"
-                android:foreground="?attr/selectableItemBackground"
-                card_view:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rdcorner_blue"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="25dp">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@drawable/watch_ic" />
-
-                    <TextView
-                        android:layout_width="95dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/fredoka_one"
-                        android:padding="-10dp"
-                        android:text="Watch and Learn"
-                        android:textAlignment="center"
-                        android:textColor="@android:color/white"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Card 3: Your Progress -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:elevation="4dp"
-                android:foreground="?attr/selectableItemBackground"
-                card_view:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rdcorner_blue"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="25dp">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@drawable/read_ic" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/fredoka_one"
-                        android:text="Your Progress"
-                        android:textAlignment="center"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
 
         <!-- Big Banner: "Ready to Test Yourself? Start Now!" -->
         <!-- CHANGED HERE: fixed height to prevent expansion -->
 
         <!-- Info Banner: "All you need to know about SAT! Test dates" -->
         <LinearLayout
+            android:id="@+id/gototest"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginBottom="16dp"
@@ -235,62 +123,61 @@
                 android:textSize="25sp" />
         </LinearLayout>
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_marginTop="15dp"
+            android:layout_height="180dp"
+            android:id="@+id/goToLeaderboard"
+            android:layout_marginBottom="16dp"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/leaderboard">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:fontFamily="@font/fredoka_one"
+                    android:text="Leaderboard"
+                    android:textColor="#FFFFFF"
+                    android:textSize="35sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal">
 
-            <LinearLayout
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/goToCollegeBoard"
+            android:layout_width="match_parent"
+            android:layout_height="119dp"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="6"
+            android:background="@drawable/rdcorner_blue"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="25dp">
+
+
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginRight="5dp"
-                android:layout_weight="4"
-                android:background="@drawable/rdcorner_blue"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="30dp">
-
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/fredoka_one"
-                    android:padding="10dp"
-                    android:text="All you need to know about SAT!"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="5dp"
-                android:layout_weight="6"
-                android:background="@drawable/rdcorner_blue"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="25dp">
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginBottom="8dp"
-                    android:src="@drawable/watch_ic" />
-
-                <TextView
-                    android:layout_width="95dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/fredoka_one"
-                    android:padding="-10dp"
-                    android:text="Watch and Learn"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/fredoka_one"
+                android:padding="-20dp"
+                android:text="Visit the official app of Collegeboard!!"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
         </LinearLayout>
 
     </LinearLayout>

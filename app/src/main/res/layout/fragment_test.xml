@@ -43,36 +43,7 @@
             android:textSize="16sp" />
 
         <!-- Search Bar -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/search_bg"
-            android:orientation="horizontal"
-            android:padding="8dp">
 
-            <EditText
-                android:id="@+id/etSearch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="9"
-                android:background="@android:color/transparent"
-                android:hint="Search for anything!!"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:padding="8dp"
-                android:textColor="@android:color/black" />
-
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/search_ic" />
-        </LinearLayout>
     </LinearLayout>
 
     <!-- Leaderboard -->

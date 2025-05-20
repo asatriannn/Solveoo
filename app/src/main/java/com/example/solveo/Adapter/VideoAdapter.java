@@ -19,7 +19,7 @@ import java.util.List;
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<VideoModel> videoList;
+    private  List<VideoModel> videoList;
 
     public VideoAdapter(Context context, List<VideoModel> videoList) {
         this.context = context;
@@ -49,6 +49,12 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     public int getItemCount() {
         return videoList.size();
     }
+
+    public void filterList(List<VideoModel> filteredList) {
+        this.videoList = filteredList;
+        notifyDataSetChanged();
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title;

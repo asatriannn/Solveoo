@@ -144,4 +144,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void setSelectedNavItem(int itemId) {
+        binding.bottomNavigation.setSelectedItemId(itemId);
+    }
+
 }
